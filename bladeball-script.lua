@@ -165,50 +165,29 @@ local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 10)
 closeCorner.Parent = closeButton
 
--- Animation
-local openTween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-    Position = UDim2.new(0.5, -200, 0.5, -150)
-})
-openTween:Play()
+-- Additional Toggles
+local antiDetectToggle = Instance.new("TextButton")
+antiDetectToggle.Name = "AntiDetectToggle"
+antiDetectToggle.Parent = mainFrame
+antiDetectToggle.BackgroundColor3 = config.antiDetections and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+antiDetectToggle.BorderSizePixel = 0
+antiDetectToggle.Position = UDim2.new(0, 190, 0, 60)
+antiDetectToggle.Size = UDim2.new(0, 150, 0, 40)
+antiDetectToggle.Font = Enum.Font.Gotham
+antiDetectToggle.Text = "Anti-Detect: ON"
+antiDetectToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+antiDetectToggle.TextSize = 14
 
--- Core Functions
-local function getBall()
-    for _, obj in pairs(workspace:GetChildren()) do
-        if obj.Name == "Ball" or obj:FindFirstChild("BallCore") then
-            return obj
-        end
-    end
-    return nil
-end
+local antiDetectCorner = Instance.new("UICorner")
+antiDetectCorner.CornerRadius = UDim.new(0, 5)
+antiDetectCorner.Parent = antiDetectToggle
 
-local function canParry()
-    local player = Players.LocalPlayer
-    local character = player.Character
-    if not character then return false end
-    
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if not humanoid or humanoid.Health <= 0 then return false end
-    
-    local tool = character:FindFirstChildOfClass("Tool")
-    return tool ~= nil
-end
-
-local function parry()
-    if not canParry() then return end
-    
-    local player = Players.LocalPlayer
-    local character = player.Character
-    local tool = character:FindFirstChildOfClass("Tool")
-    
-    if tool and tool:FindFirstChild("ParryEvent") then
-        tool.ParryEvent:Fire()
-    end
-end
-
-local function calculateBallVelocity(ball)
-    if not ball or not ball.PrimaryPart then return Vector3.new(0, 0, 0) end
-    
-    local lastPosition = ball.PrimaryPart.Position
-    local velocity = Vector3.new(0, 0, 0)
-    
-    RunService.Heartbeat:Wait
+local perfModeToggle = Instance.new("TextButton")
+perfModeToggle.Name = "PerfModeToggle"
+perfModeToggle.Parent = mainFrame
+perfModeToggle.BackgroundColor3 = config.performanceMode and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+perfModeToggle.BorderSizePixel = 0
+perfModeToggle.Position = UDim2.new(0, 20, 0, 105)
+perfModeToggle.Size = UDim2.new(0, 150, 0, 40)
+perfModeToggle.Font = Enum.Font.Gotham
+perfMode
