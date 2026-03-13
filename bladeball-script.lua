@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
+local StarterGui = game:GetService("StarterGui")
 
 -- Configuration
 local config = {
@@ -13,7 +14,9 @@ local config = {
     showUI = true,
     notifications = true,
     antiDetections = true,
-    performanceMode = false
+    performanceMode = false,
+    autoTarget = true,
+    predictionEnabled = true
 }
 
 -- Anti-Detection Variables
@@ -22,11 +25,24 @@ local function random(min, max)
     return math.random(min * 1000, max * 1000) / 1000
 end
 
+-- Notification System
+local function notify(text, duration)
+    if config.notifications then
+        StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "[Blade Ball Pro] " .. text,
+            Color = Color3.fromRGB(0, 255, 100),
+            Font = Enum.Font.GothamBold,
+            FontSize = Enum.FontSize.Size18
+        })
+    end
+end
+
 -- UI Creation
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = randomSeed
 screenGui.Parent = game:GetService("CoreGui")
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.ResetOnSpawn = false
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
@@ -36,6 +52,7 @@ mainFrame.BorderSizePixel = 0
 mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
 mainFrame.Size = UDim2.new(0, 400, 0, 300)
 mainFrame.ClipsDescendants = true
+mainFrame.Draggable = true
 
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 10)
@@ -57,7 +74,7 @@ local titleCorner = Instance.new("UICorner")
 titleCorner.CornerRadius = UDim.new(0, 10)
 titleCorner.Parent = titleLabel
 
--- Toggle Button
+-- Main Toggles
 local parryToggle = Instance.new("TextButton")
 parryToggle.Name = "ParryToggle"
 parryToggle.Parent = mainFrame
@@ -74,14 +91,62 @@ local parryCorner = Instance.new("UICorner")
 parryCorner.CornerRadius = UDim.new(0, 5)
 parryCorner.Parent = parryToggle
 
+local antiDetectToggle = Instance.new("TextButton")
+antiDetectToggle.Name = "AntiDetectToggle"
+antiDetectToggle.Parent = mainFrame
+antiDetectToggle.BackgroundColor3 = config.antiDetections and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+antiDetectToggle.BorderSizePixel = 0
+antiDetectToggle.Position = UDim2.new(0, 190, 0, 60)
+antiDetectToggle.Size = UDim2.new(0, 150, 0, 40)
+antiDetectToggle.Font = Enum.Font.Gotham
+antiDetectToggle.Text = "Anti-Detect: ON"
+antiDetectToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+antiDetectToggle.TextSize = 14
+
+local antiDetectCorner = Instance.new("UICorner")
+antiDetectCorner.CornerRadius = UDim.new(0, 5)
+antiDetectCorner.Parent = antiDetectToggle
+
+local targetToggle = Instance.new("TextButton")
+targetToggle.Name = "TargetToggle"
+targetToggle.Parent = mainFrame
+targetToggle.BackgroundColor3 = config.autoTarget and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+targetToggle.BorderSizePixel = 0
+targetToggle.Position = UDim2.new(0, 20, 0, 110)
+targetToggle.Size = UDim2.new(0, 150, 0, 40)
+targetToggle.Font = Enum.Font.Gotham
+targetToggle.Text = "Auto Target: ON"
+targetToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+targetToggle.TextSize = 14
+
+local targetCorner = Instance.new("UICorner")
+targetCorner.CornerRadius = UDim.new(0, 5)
+targetCorner.Parent = targetToggle
+
+local predictionToggle = Instance.new("TextButton")
+predictionToggle.Name = "PredictionToggle"
+predictionToggle.Parent = mainFrame
+predictionToggle.BackgroundColor3 = config.predictionEnabled and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
+predictionToggle.BorderSizePixel = 0
+predictionToggle.Position = UDim2.new(0, 190, 0, 110)
+predictionToggle.Size = UDim2.new(0, 150, 0, 40)
+predictionToggle.Font = Enum.Font.Gotham
+predictionToggle.Text = "Prediction: ON"
+predictionToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+predictionToggle.TextSize = 14
+
+local predictionCorner = Instance.new("UICorner")
+predictionCorner.CornerRadius = UDim.new(0, 5)
+predictionCorner.Parent = predictionToggle
+
 -- Settings Frame
 local settingsFrame = Instance.new("Frame")
 settingsFrame.Name = "SettingsFrame"
 settingsFrame.Parent = mainFrame
 settingsFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 settingsFrame.BorderSizePixel = 0
-settingsFrame.Position = UDim2.new(0, 20, 0, 120)
-settingsFrame.Size = UDim2.new(0, 360, 0, 160)
+settingsFrame.Position = UDim2.new(0, 20, 0, 170)
+settingsFrame.Size = UDim2.new(0, 360, 0, 110)
 
 local settingsCorner = Instance.new("UICorner")
 settingsCorner.CornerRadius = UDim.new(0, 5)
@@ -108,7 +173,7 @@ delaySlider.Parent = settingsFrame
 delaySlider.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
 delaySlider.BorderSizePixel = 0
 delaySlider.Position = UDim2.new(0, 10, 0, 35)
-delaySlider.Size = UDim2.new(0, 150, 0, 25)
+delaySlider.Size = UDim2.new(0, 100, 0, 25)
 delaySlider.Font = Enum.Font.Gotham
 delaySlider.Text = tostring(config.autoParryDelay)
 delaySlider.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -125,69 +190,7 @@ distanceLabel.Parent = settingsFrame
 distanceLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 distanceLabel.BackgroundTransparency = 1
 distanceLabel.BorderSizePixel = 0
-distanceLabel.Position = UDim2.new(0, 10, 0, 70)
+distanceLabel.Position = UDim2.new(0, 120, 0, 10)
 distanceLabel.Size = UDim2.new(0, 100, 0, 20)
 distanceLabel.Font = Enum.Font.Gotham
-distanceLabel.Text = "Parry Distance: " .. config.autoParryDistance
-distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-distanceLabel.TextSize = 12
-distanceLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-local distanceSlider = Instance.new("TextBox")
-distanceSlider.Name = "DistanceSlider"
-distanceSlider.Parent = settingsFrame
-distanceSlider.BorderSizePixel = 0
-distanceSlider.Position = UDim2.new(0, 10, 0, 95)
-distanceSlider.Size = UDim2.new(0, 150, 0, 25)
-distanceSlider.Font = Enum.Font.Gotham
-distanceSlider.Text = tostring(config.autoParryDistance)
-distanceSlider.TextColor3 = Color3.fromRGB(255, 255, 255)
-distanceSlider.TextSize = 12
-
-local distSliderCorner = Instance.new("UICorner")
-distSliderCorner.CornerRadius = UDim.new(0, 3)
-distSliderCorner.Parent = distanceSlider
-
--- Close Button
-local closeButton = Instance.new("TextButton")
-closeButton.Name = "CloseButton"
-closeButton.Parent = mainFrame
-closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeButton.BorderSizePixel = 0
-closeButton.Position = UDim2.new(1, -40, 0, 0)
-closeButton.Size = UDim2.new(0, 40, 0, 40)
-closeButton.Font = Enum.Font.GothamBold
-closeButton.Text = "X"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.TextSize = 16
-
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 10)
-closeCorner.Parent = closeButton
-
--- Additional Toggles
-local antiDetectToggle = Instance.new("TextButton")
-antiDetectToggle.Name = "AntiDetectToggle"
-antiDetectToggle.Parent = mainFrame
-antiDetectToggle.BackgroundColor3 = config.antiDetections and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
-antiDetectToggle.BorderSizePixel = 0
-antiDetectToggle.Position = UDim2.new(0, 190, 0, 60)
-antiDetectToggle.Size = UDim2.new(0, 150, 0, 40)
-antiDetectToggle.Font = Enum.Font.Gotham
-antiDetectToggle.Text = "Anti-Detect: ON"
-antiDetectToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-antiDetectToggle.TextSize = 14
-
-local antiDetectCorner = Instance.new("UICorner")
-antiDetectCorner.CornerRadius = UDim.new(0, 5)
-antiDetectCorner.Parent = antiDetectToggle
-
-local perfModeToggle = Instance.new("TextButton")
-perfModeToggle.Name = "PerfModeToggle"
-perfModeToggle.Parent = mainFrame
-perfModeToggle.BackgroundColor3 = config.performanceMode and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(200, 50, 50)
-perfModeToggle.BorderSizePixel = 0
-perfModeToggle.Position = UDim2.new(0, 20, 0, 105)
-perfModeToggle.Size = UDim2.new(0, 150, 0, 40)
-perfModeToggle.Font = Enum.Font.Gotham
-perfMode
+distance
